@@ -17,10 +17,10 @@ AVR_CFLAGS += -DAVR_EEPROM_SIZE=512
 
 CFLAGS += -std=c99 -Wall -W
 CFLAGS += -Isrc/pt
-CFLAGS += "-DVERSION=\"(unknown)\""
 
 OBJDIR = objdir
 
+BINARY = hauptuhr
 MODULES += blink fifo string_format test thread timer uart
 
 EXTRA_DEPENDENCIES =
@@ -30,35 +30,40 @@ OBJECTS =
 
 OBJECTS += $(addsuffix .o,$(MODULES))
 
-EXTRA_DEPENDENCIES += Makefile
+EXTRA_DEPENDENCIES += Makefile VERSION-FILE
 EXTRA_DEPENDENCIES += $(foreach m,$(MODULES),src/$(m).h)
 EXTRA_DEPENDENCIES += src/pt/pt.h src/pt/lc.h src/pt/lc-switch.h
 
 ifndef V
-    QUIET_CC = @echo '   ' CC $@;
-    QUIET_LINK = @echo '   ' LINK $@;
+    QUIET_CC =      @echo '   ' CC $@;
+    QUIET_LINK =    @echo '   ' LINK $@;
     QUIET_OBJCOPY = @echo '   ' OBJCOPY $@;
 endif
 
-default: $(OBJDIR)/hauptuhr.bin
+VERSION-FILE: FORCE
+	@./VERSION-GEN
+-include VERSION-FILE
+CFLAGS += -DVERSION='"$(VERSION)"'
+
+default: $(OBJDIR)/$(BINARY).bin
 
 all: default
 
 clean:
 	$(RM) -r $(OBJDIR) VERSION-FILE
 
-install: $(OBJDIR)/hauptuhr.hex
+install: $(OBJDIR)/$(BINARY).hex
 	$(AVRDUDE) $(AVRDUDE_FLAGS) -U f:w:$<
 
-size: $(OBJDIR)/hauptuhr.bin
+size: $(OBJDIR)/$(BINARY).bin
 	@stat -c "%n: %s bytes" $<
 
-.PHONY: default all clean install size test
+.PHONY: default all clean install size test FORCE
 
 $(OBJDIR):
 	$(MKDIR) $@
 
-$(OBJDIR)/hauptuhr: $(addprefix $(OBJDIR)/,$(OBJECTS))
+$(OBJDIR)/$(BINARY): $(addprefix $(OBJDIR)/,$(OBJECTS))
 	$(QUIET_LINK)$(AVR_CC) $(CFLAGS) $(AVR_CFLAGS) -o $@ $^
 
 $(addprefix $(OBJDIR)/,$(OBJECTS)): | $(OBJDIR)
