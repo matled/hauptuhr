@@ -1,0 +1,63 @@
+#!/usr/bin/env ruby
+require 'fcntl'
+
+class Serial
+  def initialize(path, serial = "b19200", terminal = "icanon=0,echo=0")
+    spawn(path, serial, terminal)
+  end
+
+  def spawn(path, serial, terminal)
+    rd1, wr1 = IO.pipe
+    Process.spawn(*%W(socat -u STDIO,#{terminal} FD:3), 3 => wr1)
+    wr1.close
+
+    rd2, wr2 = IO.pipe
+    Process.spawn(*%W(socat STDIO #{path},#{serial}), in: rd1, out: wr2)
+    wr2.close
+    $stdin.reopen(rd2)
+    rd2.close
+    $stdin.fcntl(Fcntl::F_SETFL, $stdin.fcntl(Fcntl::F_GETFL) | Fcntl::O_NONBLOCK)
+  end
+
+  def show(buf)
+    now = Time.now
+    @last ||= now
+
+    prefix = now.strftime("%Y-%m-%dT%H:%M:%S.%6N ")
+    prefix << "%10.6f " % [now - @last]
+
+    buf.bytes.each_slice(16) do |block|
+      print prefix
+      print "%-39s" % block.map { |i| "%02x" % i }.each_slice(2).map { |a| a.join }.join(" ")
+      print " "
+      print(block.map { |i|
+        if (0x21..0x7e).include?(i)
+          i.chr
+        else
+          "."
+        end
+      }.join)
+      puts
+    end
+
+    @last = now
+  end
+
+  def run
+    loop do
+      next unless select([$stdin])
+
+      begin
+        buf = $stdin.sysread(4096)
+      rescue EOFError
+        return
+      end
+
+      show buf
+    end
+  end
+end
+
+if $0 == __FILE__
+  Serial.new(*ARGV).run
+end
