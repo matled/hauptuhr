@@ -21,7 +21,7 @@ CFLAGS += -Isrc/pt
 OBJDIR = objdir
 
 BINARY = hauptuhr
-MODULES += blink fifo string_format test thread timer uart
+MODULES += advance hauptuhr blink dcf77 dcf77signal fifo string_format thread timer uart
 
 EXTRA_DEPENDENCIES =
 OBJECTS =

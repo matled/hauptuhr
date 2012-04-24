@@ -3,7 +3,7 @@
 #include "thread.h"
 #include "uart.h"
 #include "fifo.h"
-#include "test.h"
+#include "hauptuhr.h"
 
 uart_state_t uart_state;
 

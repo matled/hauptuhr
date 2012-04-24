@@ -1,31 +1,31 @@
 #include <avr/io.h>
 #include <stdint.h>
 #include "thread.h"
-#include "test.h"
+#include "hauptuhr.h"
 #include "timer.h"
 
-static uint16_t blink1_arg = TPS / 2;
-static uint16_t blink2_arg = TPS;
+static uint16_t blink1_arg = TIME(1);
+static uint16_t blink2_arg = TIME(0.5);
 
 THREAD(blink1) {
-    static uint16_t time;
+    static uint16_t timer;
     THREAD_BEGIN();
     for (;;) {
-        time = ticks;
-        THREAD_YIELD_UNTIL((ticks - time) >= *THREAD_ARG(uint16_t*));
+        TIMER_RESET();
+        THREAD_YIELD_UNTIL(TIMER_DIFF() >= *THREAD_ARG(uint16_t*));
         PORTC ^= _BV(PORTC4);
     }
     THREAD_END();
 }
 
 THREAD(blink2) {
-    static uint16_t time;
+    static uint16_t timer;
     THREAD_BEGIN();
-    time = ticks;
+    TIMER_RESET();
     for (;;) {
-        THREAD_WAIT_UNTIL((ticks - time) >= *THREAD_ARG(uint16_t*));
+        THREAD_WAIT_UNTIL(TIMER_DIFF() >= *THREAD_ARG(uint16_t*));
         PORTC ^= _BV(PORTC5);
-        time = ticks;
+        TIMER_RESET();
         THREAD_YIELD();
     }
     THREAD_END();
@@ -41,5 +41,5 @@ void blink_init(void) {
     THREAD_INIT(blink2);
 
     thread_register(&threads_tick, &blink1);
-    thread_register(&threads_tick, &blink2);
+    //thread_register(&threads_tick, &blink2);
 }
