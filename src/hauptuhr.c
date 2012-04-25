@@ -1,10 +1,8 @@
 #include <avr/interrupt.h>
-#include <avr/io.h>
-#include <avr/version.h>
 #include <avr/wdt.h>
-#include <util/delay.h>
 #include <stdlib.h>
 
+#include "hardware.h"
 #include "advance.h"
 #include "blink.h"
 #include "dcf77.h"
@@ -25,7 +23,7 @@ static void console(char c) {
         uart_printf("a:polarity=%d working=%d\r\n",
             advance_polarity(), advance_busy());
     case 'r':
-        PORTC ^= _BV(PORTC5);
+        hardware_led(1, -1);
         uart_print(".\r\n");
         break;
     }

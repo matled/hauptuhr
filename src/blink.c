@@ -1,4 +1,3 @@
-#include <avr/io.h>
 #include <stdint.h>
 #include "hardware.h"
 #include "thread.h"
@@ -12,7 +11,6 @@ THREAD(blink1) {
         TIMER_RESET();
         THREAD_YIELD_UNTIL(TIMER_DIFF() >= TIME(1));
         hardware_led(0, -1);
-        PORTC ^= _BV(PORTC4);
     }
     THREAD_END();
 }
