@@ -14,6 +14,7 @@ AVR_CFLAGS += -Os -finline-limit=800
 AVR_CFLAGS += -mmcu=atmega168
 AVR_CFLAGS += -DF_CPU=16000000UL
 AVR_CFLAGS += -DAVR_EEPROM_SIZE=512
+AVR_CFLAGS += -mcall-prologues
 
 CFLAGS += -std=c99 -Wall -W
 CFLAGS += -Isrc/pt
@@ -21,7 +22,7 @@ CFLAGS += -Isrc/pt
 OBJDIR = objdir
 
 BINARY = hauptuhr
-MODULES += advance hauptuhr blink dcf77 dcf77signal fifo string_format thread timer uart
+MODULES += hauptuhr advance blink dcf77 dcf77signal eeprom fifo string_format thread timer uart
 
 EXTRA_DEPENDENCIES =
 OBJECTS =
@@ -32,6 +33,7 @@ OBJECTS += $(addsuffix .o,$(MODULES))
 
 EXTRA_DEPENDENCIES += Makefile VERSION-FILE
 EXTRA_DEPENDENCIES += $(foreach m,$(MODULES),src/$(m).h)
+EXTRA_DEPENDENCIES += src/hardware.h
 EXTRA_DEPENDENCIES += src/pt/pt.h src/pt/lc.h src/pt/lc-switch.h
 
 ifndef V

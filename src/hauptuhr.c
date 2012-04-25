@@ -22,11 +22,8 @@ static void console(char c) {
         advance();
         break;
     case 'A':
-        if (advance_busy()) {
-            uart_puts("a:busy");
-        } else {
-            uart_puts("a:idle");
-        }
+        uart_printf("a:polarity=%d working=%d\r\n",
+            advance_polarity(), advance_busy());
     case 'r':
         PORTC ^= _BV(PORTC5);
         uart_print(".\r\n");
@@ -60,6 +57,8 @@ void minute_done(dcf77_t *dcf77) {
 
 int main(void) {
     advance_init();
+    advance();
+
     blink_init();
     dcf77signal_init(dcf77_update);
     dcf77_init(minute_done);

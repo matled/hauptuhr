@@ -1,5 +1,4 @@
-#include <avr/io.h>
-
+#include "hardware.h"
 #include "advance.h"
 #include "uart.h"
 #include "hauptuhr.h"
@@ -21,13 +20,13 @@ THREAD(advance_thread) {
     for (;;) {
         THREAD_WAIT_UNTIL(advance_state.working);
         if (advance_state.polarity) {
-            PORTB |= _BV(PORTB1);
+            hardware_advance1();
         } else {
-            PORTB |= _BV(PORTB2);
+            hardware_advance2();
         }
         TIMER_RESET();
         THREAD_WAIT_UNTIL(TIMER_DIFF() >= TIME(0.2));
-        PORTB &= ~(_BV(PORTB1) | _BV(PORTB2));
+        hardware_advance_disable();
         advance_state.polarity ^= 1;
         advance_state.working = 0;
     }
@@ -43,11 +42,11 @@ int8_t advance_busy(void) {
     return advance_state.working;
 }
 
-void advance_init(void) {
-    /* disabled by default */
-    PORTB &= ~(_BV(PORTB1) | _BV(PORTB2));
-    /* output pins */
-    DDRB |= _BV(DDB1) | _BV(DDB2);
+uint8_t advance_polarity(void) {
+    return advance_state.polarity;
+}
 
+void advance_init(void) {
+    hardware_advance_init();
     thread_register(&threads_busy, &advance_thread);
 }
