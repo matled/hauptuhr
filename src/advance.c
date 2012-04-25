@@ -48,5 +48,6 @@ uint8_t advance_polarity(void) {
 
 void advance_init(void) {
     hardware_advance_init();
+    THREAD_INIT(advance_thread);
     thread_register(&threads_busy, &advance_thread);
 }

@@ -1,6 +1,5 @@
-#include <avr/io.h>
-
 #include "dcf77signal.h"
+#include "hardware.h"
 #include "thread.h"
 #include "hauptuhr.h"
 #include "uart.h"
@@ -23,7 +22,7 @@ THREAD(dcf77signal) {
     THREAD_BEGIN();
 
     for (;;) {
-        while (!(PIND & _BV(PORTD3))) {
+        while (!hardware_dcf77()) {
             TIMER_NO_WRAP();
             THREAD_YIELD();
         }
@@ -43,7 +42,7 @@ THREAD(dcf77signal) {
 
         TIMER_RESET();
 
-        while (PIND & _BV(PORTD3)) {
+        while (hardware_dcf77()) {
             TIMER_NO_WRAP();
             THREAD_YIELD();
         }
@@ -67,12 +66,10 @@ THREAD(dcf77signal) {
 }
 
 void dcf77signal_init(dcf77signal_callback_t callback) {
+    hardware_dcf77_init();
     /* store callback */
     dcf77signal_state.callback = callback;
-    /* dcf77 enable/disable is a output pin */
-    DDRB |= _BV(DDB0);
-    /* enable dcf77 */
-    PORTB &= ~_BV(PORTB0);
     /* register thread */
+    THREAD_INIT(dcf77signal);
     thread_register(&threads_tick, &dcf77signal);
 }   

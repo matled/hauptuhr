@@ -1,4 +1,22 @@
+#ifndef HARDWARE_H
+#define HARDWARE_H
+
+#include <stdbool.h>
 #include <avr/io.h>
+
+#include "timer.h"
+
+static inline void hardware_timer_init(void) {
+    /* use 16 bit timer/counter 1 */
+    /* CTC mode */
+    TCCR1B |= _BV(WGM12);
+    /* 256 prescaling */
+    TCCR1B |= _BV(CS12);
+    /* compare value */
+    OCR1A = F_CPU / TPS / 256;
+    /* compare match interrupt */
+    TIMSK1 |= _BV(OCIE1A);
+}
 
 static inline void hardware_uart_init(void) {
     /* set baud rate */
@@ -18,7 +36,7 @@ static inline void hardware_uart_init(void) {
     PORTD |= _BV(PORTD0);
 }
 
-static inline uint8_t hardware_uart_recv_ready(void) {
+static inline bool hardware_uart_recv_ready(void) {
     return bit_is_set(UCSR0A, RXC0);
 }
 
@@ -27,13 +45,20 @@ static inline char hardware_uart_recv(void) {
     return UDR0;
 }
 
-static inline uint8_t hardware_uart_send_ready(void) {
+static inline bool hardware_uart_send_ready(void) {
     return bit_is_set(UCSR0A, UDRE0);
 }
 
 /* call this only after hardware_uart_recv_ready returns 1 */
 static inline void hardware_uart_send(char c) {
     UDR0 = c;
+}
+
+static inline void hardware_advance_init(void) {
+    /* disabled by default */
+    PORTB &= ~(_BV(PORTB1) | _BV(PORTB2));
+    /* output pins */
+    DDRB |= _BV(DDB1) | _BV(DDB2);
 }
 
 static inline void hardware_advance_disable(void) {
@@ -48,12 +73,37 @@ static inline void hardware_advance2(void) {
     PORTB |= _BV(PORTB2);
 }
 
-static inline void hardware_advance_init(void) {
-    /* disabled by default */
-    PORTB &= ~(_BV(PORTB1) | _BV(PORTB2));
-    /* output pins */
-    DDRB |= _BV(DDB1) | _BV(DDB2);
+static inline void hardware_dcf77_init(void) {
+    /* dcf77 enable/disable is a output pin */
+    DDRB |= _BV(DDB0);
+    /* enable dcf77 */
+    PORTB &= ~_BV(PORTB0);
 }
+
+static inline bool hardware_dcf77(void) {
+    return bit_is_set(PIND, PORTD3);
+}
+
+static inline void hardware_led_init(void) {
+    DDRC |= _BV(DDC4) | _BV(DDC5);
+}
+
+static inline void hardware_led(uint8_t led, int8_t value) {
+    if (led == 0) {
+        led = _BV(PORTC4);
+    } else {
+        led = _BV(PORTC5);
+    }
+
+    if (value == -1) {
+        PORTC ^= led;
+    } else if (value == 0) {
+        PORTC &= ~led;
+    } else {
+        PORTC |= led;
+    }
+}
+
 
 /* TODO: interrupts may be used in one of two ways:
  * either it just wakes the cpu up from sleeping
@@ -76,4 +126,6 @@ static inline void hardware_uart_send_enable(void) {
 static inline void hardware_uart_send_disable(void) {
     /* UCSRB &= ~_BV(UDRIE); */
 }
+#endif
+
 #endif
