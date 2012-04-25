@@ -22,7 +22,7 @@ CFLAGS += -Isrc/pt
 OBJDIR = objdir
 
 BINARY = hauptuhr
-MODULES += hauptuhr advance blink dcf77 dcf77signal eeprom fifo string_format thread timer uart
+MODULES += hauptuhr advance blink dcf77 dcf77signal eeprom fifo hardware string_format thread timer uart
 
 EXTRA_DEPENDENCIES =
 OBJECTS =
@@ -33,7 +33,6 @@ OBJECTS += $(addsuffix .o,$(MODULES))
 
 EXTRA_DEPENDENCIES += Makefile VERSION-FILE
 EXTRA_DEPENDENCIES += $(foreach m,$(MODULES),src/$(m).h)
-EXTRA_DEPENDENCIES += src/hardware.h
 EXTRA_DEPENDENCIES += src/pt/pt.h src/pt/lc.h src/pt/lc-switch.h
 
 ifndef V

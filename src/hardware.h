@@ -104,6 +104,16 @@ static inline void hardware_led(uint8_t led, int8_t value) {
     }
 }
 
+static inline uint16_t hardware_eeprom_size(void) {
+    return AVR_EEPROM_SIZE;
+}
+
+static inline bool hardware_eeprom_ready(void) {
+    return bit_is_clear(EECR, EEPE);
+}
+
+uint8_t hardware_eeprom_read(uint16_t address);
+void hardware_eeprom_write(uint16_t address, uint16_t value);
 
 /* TODO: interrupts may be used in one of two ways:
  * either it just wakes the cpu up from sleeping
@@ -111,6 +121,12 @@ static inline void hardware_led(uint8_t led, int8_t value) {
  */
 
 #if 0
+static inline void hardware_eeprom_write_enable(void) {
+}
+
+static inline void hardware_eeprom_write_disable(void) {
+}
+
 static inline void hardware_uart_recv_enable(void) {
     /* UCSRB |= _BV(RXCIE); */
 }
