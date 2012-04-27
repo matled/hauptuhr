@@ -24,6 +24,8 @@ typedef struct _thread_t {
 #define THREAD_INIT(thread) PT_INIT(&(thread).pt)
 #define THREAD_BEGIN() PT_BEGIN(&self->pt)
 #define THREAD_END() PT_END(&self->pt)
+#define THREAD_EXIT() PT_EXIT(&self->pt)
+#define THREAD_RESTART() PT_RESTART(&self->pt)
 #define THREAD_WAIT_UNTIL(condition) PT_WAIT_UNTIL(&self->pt, (condition))
 #define THREAD_WAIT_WHILE(condition) PT_WAIT_WHILE(&self->pt, (condition))
 #define THREAD_YIELD_UNTIL(condition) PT_YIELD_UNTIL(&self->pt, (condition))

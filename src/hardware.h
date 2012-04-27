@@ -115,6 +115,9 @@ static inline bool hardware_eeprom_ready(void) {
 uint8_t hardware_eeprom_read(uint16_t address);
 void hardware_eeprom_write(uint16_t address, uint16_t value);
 
+#define hardware_eeprom_write_enable() do { } while (0)
+#define hardware_eeprom_write_disable() do { } while (0)
+
 /* TODO: interrupts may be used in one of two ways:
  * either it just wakes the cpu up from sleeping
  * or it signals threads to be run

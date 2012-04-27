@@ -10,9 +10,12 @@
 #include "thread.h"
 #include "timer.h"
 #include "uart.h"
+#include "eeprom.h"
 
 thread_t *threads_busy = NULL;
 thread_t *threads_tick = NULL;
+
+static uint16_t value;
 
 static void console(char c) {
     switch (c) {
@@ -22,6 +25,13 @@ static void console(char c) {
     case 'A':
         uart_printf("a:polarity=%d working=%d\r\n",
             advance_polarity(), advance_busy());
+    case 'e':
+        value = eeprom_load();
+        uart_printf("eeprom v=%u l=%u\r\n", value, eeprom_state.location);
+        break;
+    case 'E':
+        eeprom_store(value + 1);
+        break;
     case 'r':
         hardware_led(1, -1);
         uart_print(".\r\n");
@@ -62,6 +72,8 @@ int main(void) {
     dcf77_init(minute_done);
     timer_init();
     uart_init(console);
+
+    eeprom_init();
 
     wdt_disable();
 
