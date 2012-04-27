@@ -1,11 +1,9 @@
-#ifndef DEFINE_INLINE
-
-#include "clock.h"
-#include "uart.h"
-#include "thread.h"
-#include "hauptuhr.h"
 #include "advance.h"
+#include "clock.h"
 #include "eeprom.h"
+#include "hauptuhr.h"
+#include "thread.h"
+#include "uart.h"
 
 /* mod CLOCK_MINUTES for values > -CLOCK_MINUTES */
 #define MOD_TIME(time) (((time) + CLOCK_MINUTES) % CLOCK_MINUTES)
@@ -70,10 +68,6 @@ THREAD(clock_thread) {
     THREAD_END();
 }
 
-static void clock_reschedule(void) {
-    /* TODO: run thread immediately */
-}
-
 void clock_init(void) {
     THREAD_INIT(clock_thread);
     thread_register(&threads_busy, &clock_thread);
@@ -119,7 +113,6 @@ void clock_set(uint16_t time) {
     }
 
     save();
-    clock_reschedule();
     clock_print_state("set");
 }
 
@@ -143,14 +136,12 @@ void clock_adjust(void) {
     }
 
     save();
-    clock_reschedule();
     clock_print_state("adjust");
 }
 
 void clock_advance(int8_t value) {
     uart_printf("C:advance\r\n");
     clock_state.time = MOD_TIME(clock_state.time + value);
-    clock_reschedule();
     clock_print_state("advance");
 }
 
@@ -169,19 +160,3 @@ void clock_stop(void) {
     save();
     clock_print_state("stop");
 }
-
-#else /* DEFINE_INLINE */
-
-static inline int16_t clock_get_time(void) {
-    return clock_state.time;
-}
-
-static inline int16_t clock_get_clock(void) {
-    return clock_state.clock;
-}
-
-static inline uint8_t clock_get_state(void) {
-    return clock_state.state;
-}
-
-#endif /* DEFINE_INLINE */

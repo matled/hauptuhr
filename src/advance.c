@@ -25,7 +25,7 @@ THREAD(advance_thread) {
             hardware_advance2();
         }
         TIMER_RESET();
-        THREAD_WAIT_UNTIL(TIMER_DIFF() >= TIME(0.2));
+        THREAD_WAIT_UNTIL(TIMER_DIFF() >= TIME(ADVANCE_DURATION));
         hardware_advance_disable();
         advance_state.polarity ^= 1;
         advance_state.working = 0;
