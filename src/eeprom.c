@@ -99,10 +99,10 @@ THREAD(eeprom_write) {
             state.valid = (state.valid & 0x80) ^ 0x80;
         }
 
-        state.start_working = 0;
-
         /* loop until no start_working call was made during THREAD_WAIT_UNTIL */
         for (;;) {
+            state.start_working = 0;
+
             /* wait for eeprom to be ready for write */
             THREAD_WAIT_UNTIL(hardware_eeprom_ready());
             /* restart if eeprom_store has been called in between */
