@@ -22,8 +22,6 @@ extern eeprom_state_t eeprom_state;
 uint16_t eeprom_load(void);
 /* store value in eeprom (14 bits only) */
 void eeprom_store(uint16_t);
-/* callback function for writing to eeprom */
-//void eeprom_write(void);
 void eeprom_init(void);
 
 #endif

@@ -33,7 +33,7 @@ eeprom_state_t eeprom_state;
 
 /* load value from eeprom.  do not call this function if store is in
  * progress.  it is recommended to call this function only once. */
-uint16_t eeprom_load(void) {
+static uint16_t load(void) {
     /* valid:
      * 0xff => no valid position found yet
      * 0x00 => valid positions: a = 0b0xxx_xxx && b = 0b1xxx_xxxx
@@ -74,6 +74,10 @@ uint16_t eeprom_load(void) {
         state.value = (a & 0x7f) << 7 | (b & 0x7f);
     }
 
+    return state.value;
+}
+
+uint16_t eeprom_load(void) {
     return state.value;
 }
 
@@ -136,7 +140,7 @@ void eeprom_init(void) {
 
     while (!hardware_eeprom_ready())
         ;
-    eeprom_load();
+    load();
 }
 
 /* store up to 14 bits in eeprom.  extra bits are ignored.

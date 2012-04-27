@@ -46,6 +46,10 @@ uint8_t advance_polarity(void) {
     return advance_state.polarity;
 }
 
+void advance_set_polarity(uint8_t value) {
+    advance_state.polarity = value;
+}
+
 void advance_init(void) {
     hardware_advance_init();
     THREAD_INIT(advance_thread);
