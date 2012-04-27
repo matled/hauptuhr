@@ -3,7 +3,7 @@
 #include "uart.h"
 #include "hauptuhr.h"
 #include "thread.h"
-#include "timer.h"
+#include "ticks.h"
 
 struct {
     uint8_t polarity;
@@ -14,7 +14,7 @@ struct {
 };
 
 THREAD(advance_thread) {
-    static uint16_t timer;
+    static ticks_t ticks;
     THREAD_BEGIN();
 
     for (;;) {
@@ -24,8 +24,8 @@ THREAD(advance_thread) {
         } else {
             hardware_advance2();
         }
-        TIMER_RESET();
-        THREAD_WAIT_UNTIL(TIMER_DIFF() >= TIME(ADVANCE_DURATION));
+        TICKS_RESET(ticks);
+        THREAD_WAIT_UNTIL(TICKS_DIFF(ticks) >= TICKS(ADVANCE_DURATION));
         hardware_advance_disable();
         advance_state.polarity ^= 1;
         advance_state.working = 0;

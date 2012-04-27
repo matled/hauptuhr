@@ -3,9 +3,9 @@
 #include "thread.h"
 #include "hauptuhr.h"
 #include "uart.h"
-#include "timer.h"
+#include "ticks.h"
 
-#define VAR TIME(0.05)
+#define VAR TICKS(0.05)
 /* helper macro: check if x and y differ at most by VAR */
 #define ALMOST(x, y) \
     ((x) <= (y) + (VAR) && (y) <= (x) + (VAR))
@@ -17,45 +17,45 @@ static struct {
 #define state dcf77signal_state
 
 THREAD(dcf77signal) {
-    static uint16_t timer;
+    static ticks_t ticks;
 
     THREAD_BEGIN();
 
     for (;;) {
         while (!hardware_dcf77()) {
-            TIMER_NO_WRAP();
+            TICKS_NO_WRAP(ticks);
             THREAD_YIELD();
         }
 
         /* check if last power reduction was 2s ago
          * in this case a new minute starts
          */
-        if (ALMOST(TIMER_DIFF(), TIME(2))) {
+        if (ALMOST(TICKS_DIFF(ticks), TICKS(2))) {
             state.callback(DCF77SIGNAL_NEW_MINUTE);
         /* check if last power reduction was not 1s ago
          * 1s would mean a bit was received and nothing has to be done
          * otherwise an error occurred
          */
-        } else if (!ALMOST(TIMER_DIFF(), TIME(1))) {
+        } else if (!ALMOST(TICKS_DIFF(ticks), TICKS(1))) {
             state.callback(DCF77SIGNAL_ERROR);
         }
 
-        TIMER_RESET();
+        TICKS_RESET(ticks);
 
         while (hardware_dcf77()) {
-            TIMER_NO_WRAP();
+            TICKS_NO_WRAP(ticks);
             THREAD_YIELD();
         }
 
         /* check if power reduction was 100ms
          * in this case a 0 bit was received
          */
-        if (ALMOST(TIMER_DIFF(), TIME(0.1))) {
+        if (ALMOST(TICKS_DIFF(ticks), TICKS(0.1))) {
             state.callback(0);
         /* check if power reduction was 200ms
          * in this case a 1 bit was received
          */
-        } else if (ALMOST(TIMER_DIFF(), TIME(0.2))) {
+        } else if (ALMOST(TICKS_DIFF(ticks), TICKS(0.2))) {
             state.callback(1);
         } else {
             state.callback(DCF77SIGNAL_ERROR);

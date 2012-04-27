@@ -4,8 +4,19 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <avr/io.h>
+#include <avr/interrupt.h>
 
-#include "timer.h"
+#include "ticks.h"
+
+static inline void hardware_interrupt_disable(void) {
+    cli();
+}
+
+static inline void hardware_interrupt_enable(void) {
+    sei();
+}
+
+extern uint8_t hardware_timer;
 
 static inline void hardware_timer_init(void) {
     /* use 16 bit timer/counter 1 */
@@ -14,7 +25,7 @@ static inline void hardware_timer_init(void) {
     /* 256 prescaling */
     TCCR1B |= _BV(CS12);
     /* compare value */
-    OCR1A = F_CPU / TPS / 256;
+    OCR1A = (F_CPU) / (TICKS_PER_SECOND) / 256;
     /* compare match interrupt */
     TIMSK1 |= _BV(OCIE1A);
 }

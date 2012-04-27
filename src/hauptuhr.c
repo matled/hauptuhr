@@ -1,5 +1,3 @@
-#include <avr/interrupt.h>
-#include <avr/wdt.h>
 #include <stdlib.h>
 
 #include "hardware.h"
@@ -8,7 +6,7 @@
 #include "dcf77.h"
 #include "dcf77signal.h"
 #include "thread.h"
-#include "timer.h"
+#include "ticks.h"
 #include "uart.h"
 #include "eeprom.h"
 #include "clock.h"
@@ -75,9 +73,7 @@ void minute_done(dcf77_t *dcf77) {
 }
 
 int main(void) {
-    wdt_disable();
-
-    timer_init();
+    ticks_init();
     uart_init(console);
 
     uart_print("hauptuhr " VERSION "\r\n");
@@ -92,7 +88,7 @@ int main(void) {
     clock_init();
     //clock_set(clock_get_time());
 
-    sei();
+    hardware_interrupt_enable();
 
     for (;;) {
         /* CALL: busy threads */

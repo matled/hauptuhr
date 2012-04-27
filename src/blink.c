@@ -2,14 +2,14 @@
 #include "hardware.h"
 #include "thread.h"
 #include "hauptuhr.h"
-#include "timer.h"
+#include "ticks.h"
 
 THREAD(blink1) {
-    static uint16_t timer;
+    static ticks_t ticks;
     THREAD_BEGIN();
     for (;;) {
-        TIMER_RESET();
-        THREAD_YIELD_UNTIL(TIMER_DIFF() >= TIME(1));
+        TICKS_RESET(ticks);
+        THREAD_YIELD_UNTIL(TICKS_DIFF(ticks) >= TICKS(1));
         hardware_led(0, -1);
     }
     THREAD_END();

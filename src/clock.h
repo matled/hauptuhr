@@ -3,8 +3,6 @@
 
 #include <stdint.h>
 
-#include "timer.h"
-
 #ifndef CLOCK_24HOURS
 #define CLOCK_MINUTES (12 * 60)
 #else
