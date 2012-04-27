@@ -14,7 +14,8 @@ void ticks_init(void);
 
 #define TICKS(seconds) ((uint16_t)((seconds) * (TICKS_PER_SECOND)))
 
-#define TICKS_INVALID(ticks) ((ticks_global - (ticks)) > 0x8000)
+#define TICKS_INVALID(ticks) ((ticks_global - (ticks)) >= 0x8000)
+#define TICKS_VALID(ticks) (!TICKS_INVALID(ticks))
 #define TICKS_INVALIDATE(ticks) do { \
     (ticks) = ticks_global - 0x8000; \
 } while (0)
