@@ -1,6 +1,8 @@
 #ifndef TIMER_H
 #define TIMER_H
 
+#include <stdint.h>
+
 /* ticks per second */
 #define TPS 100
 /* every tick one bit in this variable is set */

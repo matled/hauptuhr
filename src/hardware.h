@@ -2,6 +2,7 @@
 #define HARDWARE_H
 
 #include <stdbool.h>
+#include <stdint.h>
 #include <avr/io.h>
 
 #include "timer.h"
