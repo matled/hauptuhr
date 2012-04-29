@@ -130,6 +130,19 @@ void hardware_eeprom_write(uint16_t address, uint16_t value);
 #define hardware_eeprom_write_enable() do { } while (0)
 #define hardware_eeprom_write_disable() do { } while (0)
 
+static inline void hardware_button_init(void) {
+    /* enable pull-up */
+    PORTD |= _BV(PORTD6) | _BV(PORTD7);
+}
+
+static inline bool hardware_button1(void) {
+    return bit_is_clear(PIND, PORTD7);
+}
+
+static inline bool hardware_button2(void) {
+    return bit_is_clear(PIND, PORTD6);
+}
+
 /* TODO: interrupts may be used in one of two ways:
  * either it just wakes the cpu up from sleeping
  * or it signals threads to be run
