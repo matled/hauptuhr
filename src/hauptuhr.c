@@ -22,6 +22,9 @@ static void console(char c) {
     case 'a':
         controller_adjust();
         break;
+    case 'A':
+        controller_auto_adjust();
+        break;
     case 'z':
         controller_stop();
         break;

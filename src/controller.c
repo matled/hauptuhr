@@ -15,6 +15,7 @@ static struct {
     ticks_t ticks;
     uint8_t summer_time;
     uint8_t cet;
+    uint8_t auto_adjust;
 } state;
 
 THREAD(minute) {
@@ -40,6 +41,17 @@ THREAD(minute) {
         }
 
         TICKS_RESET(state.ticks);
+    }
+    THREAD_END();
+}
+
+THREAD(auto_adjust) {
+    THREAD_BEGIN();
+    for (;;) {
+        if (state.auto_adjust) {
+            clock_adjust();
+        }
+        THREAD_YIELD();
     }
     THREAD_END();
 }
@@ -78,11 +90,17 @@ static void dcf77_time(dcf77_t *dcf77) {
 
 void controller_adjust(void) {
     clock_adjust();
+    state.auto_adjust = 0;
     TICKS_RESET(state.ticks);
+}
+
+void controller_auto_adjust(void) {
+    state.auto_adjust = 1;
 }
 
 void controller_stop(void) {
     clock_stop();
+    state.auto_adjust = 0;
     TICKS_INVALIDATE(state.ticks);
 }
 
@@ -97,4 +115,7 @@ void controller_init(void) {
     THREAD_INIT(minute);
     thread_register(&threads_tick, &minute);
     TICKS_INVALIDATE(state.ticks);
+
+    THREAD_INIT(auto_adjust);
+    thread_register(&threads_tick, &auto_adjust);
 }
