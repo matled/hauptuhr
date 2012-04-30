@@ -1,4 +1,6 @@
 #include <stdint.h>
+#include <stdbool.h>
+
 #include "advance.h"
 #include "clock.h"
 #include "dcf77.h"
@@ -17,6 +19,7 @@ static struct {
     uint8_t summer_time;
     uint8_t cet;
     uint8_t auto_adjust;
+    bool verbose;
 } state;
 
 THREAD(minute) {
@@ -57,16 +60,23 @@ THREAD(auto_adjust) {
     THREAD_END();
 }
 
-static void dcf77_verbose(int8_t signal) {
+static void dcf77_signal(int8_t signal) {
     dcf77_update(signal);
 
     if (signal == DCF77SIGNAL_ERROR) {
-        uart_puts("DCF77 error");
         led_dcf77_error();
+    } else {
+        led_dcf77_signal();
+    }
+
+    if (signal == DCF77SIGNAL_ERROR) {
+        uart_puts("DCF77 error");
         return;
     }
 
-    led_dcf77_signal();
+    if (!state.verbose) {
+        return;
+    }
 
     /* quite internal stuff of dcf77 but nice verbose output */
     dcf77_t *d = &dcf77_state.update.dcf77;
@@ -110,8 +120,12 @@ void controller_stop(void) {
     TICKS_INVALIDATE(state.ticks);
 }
 
+void controller_verbose(bool value) {
+    state.verbose = value;
+}
+
 void controller_init(void) {
-    dcf77signal_init(dcf77_verbose);
+    dcf77signal_init(dcf77_signal);
     dcf77_init(dcf77_time);
 
     advance_init();

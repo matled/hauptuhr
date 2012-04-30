@@ -85,11 +85,18 @@ static inline void hardware_advance2(void) {
     PORTB |= _BV(PORTB2);
 }
 
+static inline void hardware_dcf77_enable(void) {
+    PORTB &= ~_BV(PORTB0);
+}
+
+static inline void hardware_dcf77_disable(void) {
+    PORTB |= _BV(PORTB0);
+}
+
 static inline void hardware_dcf77_init(void) {
     /* dcf77 enable/disable is a output pin */
     DDRB |= _BV(DDB0);
-    /* enable dcf77 */
-    PORTB &= ~_BV(PORTB0);
+    hardware_dcf77_enable();
 }
 
 static inline bool hardware_dcf77(void) {

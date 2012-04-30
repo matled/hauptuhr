@@ -42,6 +42,8 @@ extern clock_state_t clock_state;
 /* CLOCK_RUNNING: time known and clock is set */
 #define CLOCK_RUNNING 4
 
+extern const char *clock_state_name[];
+
 void clock_init(void);
 /* Set time (use this for authorative time).  Time is hour * 60 +
  * minute. */
