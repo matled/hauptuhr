@@ -8,6 +8,7 @@
 #include "thread.h"
 #include "ticks.h"
 #include "uart.h"
+#include "led.h"
 
 #include "controller.h"
 
@@ -61,8 +62,11 @@ static void dcf77_verbose(int8_t signal) {
 
     if (signal == DCF77SIGNAL_ERROR) {
         uart_puts("DCF77 error");
+        led_dcf77_error();
         return;
     }
+
+    led_dcf77_signal();
 
     /* quite internal stuff of dcf77 but nice verbose output */
     dcf77_t *d = &dcf77_state.update.dcf77;
@@ -80,6 +84,8 @@ static void dcf77_verbose(int8_t signal) {
 static void dcf77_time(dcf77_t *dcf77) {
     uart_printf("DCF77: 20%2u-%2u-%2u %2u:%2u\r\n",
         dcf77->year, dcf77->month, dcf77->day, dcf77->hour, dcf77->minute);
+
+    led_dcf77();
 
     state.summer_time = dcf77->summer_time;
     state.cet = dcf77->cet;

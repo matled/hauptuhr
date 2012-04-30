@@ -2,7 +2,6 @@
 
 #include "hardware.h"
 #include "advance.h"
-#include "blink.h"
 #include "dcf77.h"
 #include "dcf77signal.h"
 #include "thread.h"
@@ -12,6 +11,7 @@
 #include "clock.h"
 #include "controller.h"
 #include "button.h"
+#include "led.h"
 
 thread_t *threads_busy = NULL;
 thread_t *threads_tick = NULL;
@@ -44,9 +44,9 @@ int main(void) {
     ticks_init();
     uart_init(console);
     uart_print("hauptuhr " VERSION "\r\n");
-    blink_init();
     controller_init();
     button_init();
+    led_init();
 
     hardware_interrupt_enable();
 

@@ -22,7 +22,7 @@ CFLAGS += -Isrc/pt
 OBJDIR = objdir
 
 BINARY = hauptuhr
-MODULES += hauptuhr advance controller clock blink dcf77 dcf77signal eeprom
+MODULES += hauptuhr advance controller clock led dcf77 dcf77signal eeprom
 MODULES += fifo hardware string_format thread ticks uart button
 
 EXTRA_DEPENDENCIES =
