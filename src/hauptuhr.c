@@ -13,12 +13,14 @@
 #include "button.h"
 #include "led.h"
 #include "console.h"
+#include "uptime.h"
 
 thread_t *threads_busy = NULL;
 thread_t *threads_tick = NULL;
 
 int main(void) {
     ticks_init();
+    uptime_init();
     console_init();
     button_init();
     led_init();
