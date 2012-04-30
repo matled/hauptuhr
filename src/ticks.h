@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 /* ticks per second */
-#define TICKS_PER_SECOND 100
+#define TICKS_PER_SECOND 256
 
 typedef uint16_t ticks_t;
 /* every tick one bit in this variable is set */

@@ -22,10 +22,10 @@ static inline void hardware_timer_init(void) {
     /* use 16 bit timer/counter 1 */
     /* CTC mode */
     TCCR1B |= _BV(WGM12);
-    /* 256 prescaling */
-    TCCR1B |= _BV(CS12);
+    /* no prescaling */
+    TCCR1B |= _BV(CS10);
     /* compare value */
-    OCR1A = (F_CPU) / (TICKS_PER_SECOND) / 256;
+    OCR1A = (F_CPU) / (TICKS_PER_SECOND);
     /* compare match interrupt */
     TIMSK1 |= _BV(OCIE1A);
 }
