@@ -3,7 +3,6 @@
 #include "eeprom.h"
 #include "hauptuhr.h"
 #include "thread.h"
-#include "uart.h"
 
 /* mod CLOCK_MINUTES for values > -CLOCK_MINUTES */
 #define MOD_TIME(time) (((time) + CLOCK_MINUTES) % CLOCK_MINUTES)
@@ -19,15 +18,6 @@ clock_state_t clock_state = {
     .clock = 0,
     .state = CLOCK_INITIAL,
 };
-
-static void clock_print_state(const char *str) {
-    uart_printf("C:%s t=%u c=%u s=%u p=%u\r\n",
-        str,
-        clock_state.time,
-        clock_state.clock,
-        clock_state.state,
-        advance_polarity());
-}
 
 static void save(void) {
     uint16_t s;
@@ -49,15 +39,13 @@ THREAD(clock_thread) {
     for (;;) {
         /* advance clock, if */
         THREAD_WAIT_UNTIL(
-            /* advance clock is in state RUNNING or HEADLESS */
+            /* advance clock in state RUNNING or HEADLESS */
             (clock_state.state == CLOCK_RUNNING || clock_state.state == CLOCK_HEADLESS) &&
             /* advance() is ready */
             !advance_busy() &&
             /* waiting for the clock to become correct would take too long */
             MOD_TIME(clock_state.clock - clock_state.time) > (CLOCK_WAIT_STEPS)
         );
-
-        clock_print_state("thread1");
 
         /* advance clock */
         advance();
@@ -66,7 +54,6 @@ THREAD(clock_thread) {
         clock_state.clock = MOD_TIME_P(clock_state.clock + 1);
         /* save new state (including new polarity) */
         save();
-        clock_print_state("thread2");
     }
 
     THREAD_END();
@@ -93,12 +80,9 @@ void clock_init(void) {
     } else {
         advance_set_polarity((clock_state.stored >> 11) & 1);
     }
-
-    clock_print_state("init");
 }
 
 void clock_set(uint16_t time) {
-    uart_printf("C:set(%u)\r\n", time);
     clock_state.time = MOD_TIME(time);
 
     switch (clock_state.state) {
@@ -117,11 +101,9 @@ void clock_set(uint16_t time) {
     }
 
     save();
-    clock_print_state("set");
 }
 
 void clock_adjust(void) {
-    uart_printf("C:adjust\r\n");
     switch (clock_state.state) {
     case CLOCK_INITIAL:
     case CLOCK_HEADLESS:
@@ -140,17 +122,13 @@ void clock_adjust(void) {
     }
 
     save();
-    clock_print_state("adjust");
 }
 
 void clock_advance(int8_t value) {
-    uart_printf("C:advance\r\n");
     clock_state.time = MOD_TIME(clock_state.time + value);
-    clock_print_state("advance");
 }
 
 void clock_stop(void) {
-    uart_printf("C:stop\r\n");
     switch (clock_state.state) {
     case CLOCK_HEADLESS:
     case CLOCK_PENDING:
@@ -162,5 +140,4 @@ void clock_stop(void) {
     }
 
     save();
-    clock_print_state("stop");
 }
