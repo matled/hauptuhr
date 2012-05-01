@@ -20,6 +20,7 @@ static struct {
     uint8_t cet;
     uint8_t auto_adjust;
     bool verbose;
+    ticks_t last_dcf77_error;
 } state;
 
 THREAD(minute) {
@@ -70,7 +71,15 @@ static void dcf77_signal(int8_t signal) {
     }
 
     if (signal == DCF77SIGNAL_ERROR) {
-        uart_puts("DCF77 error");
+        /* throttle the number of messages shown to one per second
+         * NOTE: This function is called only if a signal is received
+         * and therefore last_dcf77_error may wrap around.  This could
+         * lead to a missed message.  As this message is quite spammy
+         * and informational this is ok. */
+        if (TICKS_DIFF(state.last_dcf77_error) >= TICKS(1)) {
+            uart_puts("DCF77 error");
+            TICKS_RESET(state.last_dcf77_error);
+        }
         return;
     }
 
