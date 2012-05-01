@@ -30,9 +30,6 @@ void uart_init(uart_receive_callback_t callback) {
     fifo_init(&uart_state.fifo, sizeof(uart_state.buf));
     /* store callback */
     uart_state.receive = callback;
-
-    hardware_uart_init();
-
     /* register threads */
     THREAD_INIT(uart_send);
     thread_register(&threads_busy, &uart_send);

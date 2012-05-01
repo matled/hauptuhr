@@ -19,6 +19,7 @@ thread_t *threads_busy = NULL;
 thread_t *threads_tick = NULL;
 
 int main(void) {
+    hardware_init();
     ticks_init();
     uptime_init();
     console_init();

@@ -58,7 +58,6 @@ THREAD(button2) {
 }
 
 void button_init(void) {
-    hardware_button_init();
     THREAD_INIT(button1);
     thread_register(&threads_busy, &button1);
     THREAD_INIT(button2);

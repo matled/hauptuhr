@@ -26,7 +26,6 @@ THREAD(ticks_update) {
 }
 
 void ticks_init(void) {
-    hardware_timer_init();
     THREAD_INIT(ticks_update);
     thread_register(&threads_busy, &ticks_update);
 }

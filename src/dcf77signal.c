@@ -66,7 +66,6 @@ THREAD(dcf77signal) {
 }
 
 void dcf77signal_init(dcf77signal_callback_t callback) {
-    hardware_dcf77_init();
     /* store callback */
     dcf77signal_state.callback = callback;
     /* register thread */
