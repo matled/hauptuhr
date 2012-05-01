@@ -87,7 +87,6 @@ static void input(char c) {
     case 'v': print_version(); break;
     case 'e': print_eeprom(); break;
     case 'h': print_help(); break;
-    case '=': uart_puts("clock="); clock_set(clock_get_clock()); break;
     default:  print_help(); break;
     }
 }
