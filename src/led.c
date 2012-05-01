@@ -176,9 +176,9 @@ void led_dcf77_error(void) {
 void led_init(void) {
     TICKS_INVALIDATE(state.last_signal);
     THREAD_INIT(red);
-    thread_register(&threads_tick, &red);
+    thread_register(&red);
     THREAD_INIT(green);
-    thread_register(&threads_tick, &green);
+    thread_register(&green);
     THREAD_INIT(signal_timeout);
-    thread_register(&threads_tick, &signal_timeout);
+    thread_register(&signal_timeout);
 }

@@ -52,5 +52,5 @@ void advance_set_polarity(uint8_t value) {
 
 void advance_init(void) {
     THREAD_INIT(advance_thread);
-    thread_register(&threads_busy, &advance_thread);
+    thread_register(&advance_thread);
 }

@@ -133,9 +133,9 @@ void controller_init(void) {
     clock_init();
 
     THREAD_INIT(minute);
-    thread_register(&threads_tick, &minute);
+    thread_register(&minute);
     TICKS_INVALIDATE(state.ticks);
 
     THREAD_INIT(auto_adjust);
-    thread_register(&threads_tick, &auto_adjust);
+    thread_register(&auto_adjust);
 }

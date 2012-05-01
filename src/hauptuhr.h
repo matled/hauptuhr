@@ -1,9 +1,9 @@
-#ifndef TEST_H
-#define TEST_H
+#ifndef HAUPTUHR_H
+#define HAUPTUHR_H
 
 #include "thread.h"
 
-extern thread_t *threads_busy;
-extern thread_t *threads_tick;
+extern thread_t *threads;
+void thread_register(thread_t*);
 
 #endif

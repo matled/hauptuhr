@@ -59,7 +59,7 @@ THREAD(button2) {
 
 void button_init(void) {
     THREAD_INIT(button1);
-    thread_register(&threads_busy, &button1);
+    thread_register(&button1);
     THREAD_INIT(button2);
-    thread_register(&threads_busy, &button2);
+    thread_register(&button2);
 }

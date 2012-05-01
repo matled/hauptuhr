@@ -32,7 +32,7 @@ void uart_init(uart_receive_callback_t callback) {
     uart_state.receive = callback;
     /* register threads */
     THREAD_INIT(uart_send);
-    thread_register(&threads_busy, &uart_send);
+    thread_register(&uart_send);
     THREAD_INIT(uart_recv);
-    thread_register(&threads_busy, &uart_recv);
+    thread_register(&uart_recv);
 }

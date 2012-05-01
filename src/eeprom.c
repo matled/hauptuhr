@@ -136,7 +136,7 @@ THREAD(eeprom_write) {
 
 void eeprom_init(void) {
     THREAD_INIT(eeprom_write);
-    thread_register(&threads_busy, &eeprom_write);
+    thread_register(&eeprom_write);
 
     while (!hardware_eeprom_ready())
         ;

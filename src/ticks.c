@@ -30,5 +30,5 @@ THREAD(ticks_update) {
 
 void ticks_init(void) {
     THREAD_INIT(ticks_update);
-    thread_register(&threads_busy, &ticks_update);
+    thread_register(&ticks_update);
 }

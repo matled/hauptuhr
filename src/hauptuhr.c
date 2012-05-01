@@ -1,24 +1,23 @@
 #include <stdlib.h>
 
+#include "button.h"
+#include "console.h"
+#include "controller.h"
 #include "hardware.h"
-#include "advance.h"
-#include "dcf77.h"
-#include "dcf77signal.h"
+#include "led.h"
 #include "thread.h"
 #include "ticks.h"
-#include "uart.h"
-#include "eeprom.h"
-#include "clock.h"
-#include "controller.h"
-#include "button.h"
-#include "led.h"
-#include "console.h"
 #include "uptime.h"
 
-thread_t *threads_busy = NULL;
-thread_t *threads_tick = NULL;
+thread_t *threads = NULL;
+
+void thread_register(thread_t *thread) {
+    thread->next = threads;
+    threads = thread;
+}
 
 int main(void) {
+    /* initialize modules */
     hardware_init();
     ticks_init();
     uptime_init();
@@ -27,13 +26,13 @@ int main(void) {
     led_init();
     controller_init();
 
+    /* enable interrupts */
     hardware_interrupt_enable();
 
     for (;;) {
-        /* CALL: busy threads */
-        THREAD_RUN_ALL(threads_busy);
-        /* CALL: ticking threads */
-        THREAD_RUN_ALL(threads_tick);
+        /* run all threads */
+        THREAD_RUN_ALL(threads);
     }
+
     return 0;
 }

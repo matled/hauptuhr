@@ -1,7 +1,6 @@
 #include "thread.h"
 #include "ticks.h"
 #include "hauptuhr.h"
-#include "uart.h"
 
 static uint16_t uptime_minutes;
 
@@ -23,5 +22,5 @@ uint16_t uptime_get(void) {
 
 void uptime_init(void) {
     THREAD_INIT(uptime);
-    thread_register(&threads_tick, &uptime);
+    thread_register(&uptime);
 }

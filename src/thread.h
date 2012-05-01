@@ -31,6 +31,4 @@ typedef struct _thread_t {
 #define THREAD_YIELD_UNTIL(condition) PT_YIELD_UNTIL(&self->pt, (condition))
 #define THREAD_YIELD() PT_YIELD(&self->pt)
 
-void thread_register(thread_t **queue, thread_t *thread);
-
 #endif

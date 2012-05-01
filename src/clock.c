@@ -57,7 +57,7 @@ THREAD(clock_thread) {
 
 void clock_init(void) {
     THREAD_INIT(clock_thread);
-    thread_register(&threads_busy, &clock_thread);
+    thread_register(&clock_thread);
 
     clock_state.stored = eeprom_load();
 
