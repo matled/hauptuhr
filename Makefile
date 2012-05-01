@@ -10,6 +10,8 @@ RM = rm -f
 
 AVRDUDE_FLAGS = -c usbasp
 
+HARDWARE = hauptuhr-v1
+
 AVR_MCU=atmega168
 AVR_F_CPU=16000000UL
 AVR_EEPROM_SIZE=512
@@ -25,7 +27,7 @@ OBJDIR = objdir
 
 BINARY = hauptuhr
 MODULES += hauptuhr advance controller clock led dcf77 dcf77signal eeprom
-MODULES += fifo hardware string_format thread ticks uart button console uptime
+MODULES += fifo string_format thread ticks uart button console uptime
 
 EXTRA_DEPENDENCIES =
 OBJECTS =
@@ -37,10 +39,11 @@ AVR_CFLAGS += -mmcu=$(AVR_MCU)
 AVR_CFLAGS += -DF_CPU=16000000UL
 AVR_CFLAGS += -DAVR_EEPROM_SIZE=512
 
-OBJECTS += $(addsuffix .o,$(MODULES))
+OBJECTS += $(addsuffix .o,$(MODULES)) hardware-$(HARDWARE).o
 
 EXTRA_DEPENDENCIES += Makefile VERSION-FILE
 EXTRA_DEPENDENCIES += $(foreach m,$(MODULES),src/$(m).h)
+EXTRA_DEPENDENCIES += src/hardware.h
 EXTRA_DEPENDENCIES += src/pt/pt.h src/pt/lc.h src/pt/lc-switch.h
 
 ifndef V
