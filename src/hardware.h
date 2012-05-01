@@ -31,7 +31,7 @@ static inline void hardware_interrupt_disable(void) {
     cli();
 }
 /* for every tick one bit is set in this variable */
-extern uint8_t hardware_timer;
+extern volatile uint8_t hardware_timer;
 /* true if a byte can be read from the uart */
 bool hardware_uart_recv_ready(void);
 /* read byte from uart

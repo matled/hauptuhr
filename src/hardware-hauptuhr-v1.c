@@ -40,7 +40,7 @@ static inline void hardware_timer_init(void) {
     TIMSK1 |= _BV(OCIE1A);
 }
 
-uint8_t hardware_timer;
+volatile uint8_t hardware_timer;
 ISR(SIG_OUTPUT_COMPARE1A) {
     hardware_timer = ~(~hardware_timer & (~hardware_timer - 1));
 }
