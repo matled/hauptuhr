@@ -1,4 +1,9 @@
-#ifndef DEFINE_INLINE
+#ifdef USE_PROGMEM
+#include <avr/pgmspace.h>
+#define str_dereference(p) pgm_read_byte(p)
+#else
+#define str_dereference(p) (*(p))
+#endif
 
 #include <stdarg.h>
 
@@ -30,7 +35,7 @@ unsigned int string_format_va(char *buf, unsigned int size,
     const char *str;
 
     for (;;) {
-        c = *format++;
+        c = str_dereference(format++);
 
         /* end of string */
         if (!c)
@@ -42,7 +47,7 @@ unsigned int string_format_va(char *buf, unsigned int size,
             continue;
         }
 
-        c = *format++;
+        c = str_dereference(format++);
 
         /* read number of leading zeros */
         leading_zeros = 0;
@@ -50,7 +55,7 @@ unsigned int string_format_va(char *buf, unsigned int size,
             /* note: this will actually ignore everything but the lowest
              * digit */
             leading_zeros = c - '0';
-            c = *format++;
+            c = str_dereference(format++);
         }
 
         /* end of string */
@@ -130,9 +135,9 @@ unsigned int string_format_va(char *buf, unsigned int size,
     return n;
 }
 
-#else /* DEFINE_INLINE */
-
-static inline unsigned int string_format(char *buf, unsigned int size,
+/* unused wrapper around string_format_va */
+#if 0
+unsigned int string_format(char *buf, unsigned int size,
                                          const char *format, ...) {
     va_list ap;
     va_start(ap, format);
@@ -140,5 +145,4 @@ static inline unsigned int string_format(char *buf, unsigned int size,
     va_end(ap);
     return size;
 }
-
-#endif /* DEFINE_INLINE */
+#endif

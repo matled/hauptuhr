@@ -1,5 +1,12 @@
 #include <stdarg.h>
 
+#ifdef USE_PROGMEM
+#include <avr/pgmspace.h>
+#define str_dereference(p) pgm_read_byte(p)
+#else
+#define str_dereference(p) (*(p))
+#endif
+
 #include "string_format.h"
 
 #include "fifo.h"
@@ -31,8 +38,8 @@ char fifo_shift(fifo_t *fifo) {
 void fifo_print(fifo_t *fifo, const char *bytes) {
     const char *p = bytes;
     /* copy until \0 or the buffer is full */
-    while (*p && !FULL(fifo)) {
-        fifo->buf[fifo->end] = *p;
+    while (str_dereference(p) && !FULL(fifo)) {
+        fifo->buf[fifo->end] = str_dereference(p);
         fifo->end = (fifo->end + 1) % fifo->size;
         ++p;
     }

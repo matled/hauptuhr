@@ -21,11 +21,9 @@
 
 /* arguments: buffer, size, format string, argument list */
 unsigned int string_format_va(char*, unsigned int, const char*, va_list);
-static inline unsigned int string_format(char*, unsigned int, const char*,
+#if 0
+unsigned int string_format(char*, unsigned int, const char*,
                                          ...);
-
-#define DEFINE_INLINE
-#include "string_format.c"
-#undef DEFINE_INLINE
+#endif
 
 #endif

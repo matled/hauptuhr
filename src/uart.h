@@ -9,6 +9,13 @@
 #define UART_FIFO_SIZE (128)
 #endif
 
+#ifdef USE_PROGMEM
+#include <avr/pgmspace.h>
+#define _UART_STR PSTR
+#else
+#define _UART_STR
+#endif
+
 #include "fifo.h"
 
 typedef void (*uart_receive_callback_t)(char);
@@ -28,11 +35,12 @@ void uart_init(uart_receive_callback_t);
 #define uart_set_callback(callback) (uart_state.receive = (callback))
 
 /* print string */
-#define uart_print(str) fifo_print(&uart_state.fifo, str)
+#define uart_print(str) fifo_print(&uart_state.fifo, _UART_STR(str))
 /* print string (only string literals) plus "\r\n" */
 #define uart_puts(str) uart_print(str "\r\n")
 /* printf */
-#define uart_printf(...) fifo_printf(&uart_state.fifo, __VA_ARGS__)
+#define uart_printf(format, ...) \
+    fifo_printf(&uart_state.fifo, _UART_STR(format), __VA_ARGS__)
 
 #include "thread.h"
 extern thread_t uart_send;
