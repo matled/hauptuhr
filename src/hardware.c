@@ -5,8 +5,25 @@
 #include "ticks.h"
 #include "hardware.h"
 
-#if !defined(__AVR_ATmega88__) && !defined(__AVR_ATmega168__)
+#if !defined(__AVR_ATmega8__) && \
+    !defined(__AVR_ATmega88__) && \
+    !defined(__AVR_ATmega168__)
 #error Unsupported CPU
+#endif
+
+#ifdef __AVR_ATmega8__
+#define TIMSK1 TIMSK
+#define UBRR0H UBRRH
+#define UBRR0L UBRRL
+#define UCSR0A UCSRA
+#define UCSR0B UCSRB
+#define UDR0 UDR
+#define UDRE0 UDRE
+#define RXC0 RXC
+#define RXEN0 RXEN
+#define TXEN0 TXEN
+#define EEMPE EEMWE
+#define EEPE EEWE
 #endif
 
 /* timer */
@@ -39,7 +56,11 @@ static inline void hardware_uart_init(void) {
     UBRR0H = UBRRH_VALUE;
     UBRR0L = UBRRL_VALUE;
     /* set mode 8N1 */
+    #ifdef __AVR_ATmega8__
+    UCSRC = _BV(URSEL) | _BV(UCSZ0) | _BV(UCSZ1);
+    #else
     UCSR0C = _BV(UCSZ00) | _BV(UCSZ01);
+    #endif
     /* enable send and receive */
     UCSR0B = _BV(TXEN0) | _BV(RXEN0);
     /* enable pull-up for rx pin */
