@@ -8,13 +8,30 @@
 #include "uptime.h"
 
 static void print_status(void) {
-    uart_printf(
+    uart_print(
         "status\r\n"
-        " state %s\r\n"
+        " state ");
+    switch (clock_get_state()) {
+    case CLOCK_INITIAL:
+        uart_print("initial");
+        break;
+    case CLOCK_PENDING:
+        uart_print("pending");
+        break;
+    case CLOCK_SYNCED:
+        uart_print("synced");
+        break;
+    case CLOCK_HEADLESS:
+        uart_print("headless");
+        break;
+    case CLOCK_RUNNING:
+        uart_print("running");
+        break;
+    }
+    uart_printf("\r\n"
         " time  %2u:%2u\r\n"
         " clock %2u:%2u\r\n"
         " up    %um\r\n",
-        clock_state_name[clock_get_state()],
         clock_get_time() / 60,
         clock_get_time() % 60,
         clock_get_clock() / 60,
@@ -38,7 +55,7 @@ static void print_stop(void) {
 }
 
 static void print_dcf77(bool value) {
-    uart_printf("DCF77 %sabled\r\n", value ? "en" : "dis");
+    uart_printf("DCF77 enabled=%u\r\n", value);
     if (value) {
         hardware_dcf77_enable();
     } else {

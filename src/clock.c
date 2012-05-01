@@ -9,10 +9,6 @@
 /* mod CLOCK_MINUTES for values >= 0 */
 #define MOD_TIME_P(time) ((time) % CLOCK_MINUTES)
 
-const char *clock_state_name[] = {
-    "initial", "headless", "pending", "synced", "running"
-};
-
 clock_state_t clock_state = {
     .time = 0,
     .clock = 0,
