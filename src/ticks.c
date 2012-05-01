@@ -2,6 +2,7 @@
 #include "hardware.h"
 #include "hauptuhr.h"
 #include "ticks.h"
+#include "uart.h"
 
 ticks_t ticks_global = 0;
 
@@ -12,10 +13,12 @@ THREAD(ticks_update) {
         THREAD_WAIT_UNTIL(hardware_timer);
 
         /* disable interrupts, clear one bit, reenable interrupts */
-        /* TODO: if hardware_timer == 255 at least 8 interrupts
-         * occurred, i.e. interrupts may be lost */
         hardware_interrupt_disable();
         hardware_timer &= hardware_timer - 1;
+        /* warn if hardware_timer accumulated more than one bit */
+        if (hardware_timer) {
+            uart_printf("w:ticks left (%u)\r\n", hardware_timer);
+        }
         hardware_interrupt_enable();
 
         /* main tick counter */
