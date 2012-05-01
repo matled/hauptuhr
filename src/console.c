@@ -10,15 +10,15 @@
 static void print_status(void) {
     uart_printf(
         "status\r\n"
-        " time  = %2u:%2u\r\n"
-        " clock = %2u:%2u\r\n"
-        " state = %s\r\n",
-        " uptime = %u\r\n",
+        " state %s\r\n"
+        " time  %2u:%2u\r\n"
+        " clock %2u:%2u\r\n"
+        " up    %um\r\n",
+        clock_state_name[clock_get_state()],
         clock_get_time() / 60,
         clock_get_time() % 60,
         clock_get_clock() / 60,
         clock_get_clock() % 60,
-        clock_state_name[clock_get_state()],
         uptime_get());
 }
 
