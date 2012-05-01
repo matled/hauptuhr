@@ -125,14 +125,11 @@ void clock_advance(int8_t value) {
 }
 
 void clock_stop(void) {
-    switch (clock_state.state) {
-    case CLOCK_HEADLESS:
-    case CLOCK_PENDING:
-        clock_state.state = CLOCK_INITIAL;
-        break;
-    case CLOCK_RUNNING:
+    if (clock_state.state == CLOCK_RUNNING ||
+        clock_state.state == CLOCK_SYNCED) {
         clock_state.state = CLOCK_SYNCED;
-        break;
+    } else {
+        clock_state.state = CLOCK_INITIAL;
     }
 
     save();
