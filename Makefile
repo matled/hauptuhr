@@ -10,8 +10,10 @@ RM = rm -f
 
 AVRDUDE_FLAGS = -p m168 -c usbasp
 
+AVR_MCU=atmega168
+
 AVR_CFLAGS += -Os -finline-limit=800
-AVR_CFLAGS += -mmcu=atmega168
+AVR_CFLAGS += -mmcu=$(AVR_MCU)
 AVR_CFLAGS += -DF_CPU=16000000UL
 AVR_CFLAGS += -DAVR_EEPROM_SIZE=512
 AVR_CFLAGS += -mcall-prologues
@@ -58,7 +60,7 @@ install: $(OBJDIR)/$(BINARY).hex
 	$(AVRDUDE) $(AVRDUDE_FLAGS) -U f:w:$<
 
 size: $(OBJDIR)/$(BINARY).bin
-	@stat -c "%n: %s bytes" $<
+	$(AVR_SIZE) -C --mcu=$(AVR_MCU) objdir/hauptuhr
 
 .PHONY: default all clean install size test FORCE
 
