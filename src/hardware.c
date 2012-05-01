@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <avr/wdt.h>
 #include "ticks.h"
 #include "hardware.h"
 
@@ -189,4 +190,5 @@ void hardware_init(void) {
     hardware_timer_init();
     hardware_uart_init();
     hardware_button_init();
+    wdt_enable(WDTO_1S);
 }

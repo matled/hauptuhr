@@ -30,6 +30,8 @@ int main(void) {
     hardware_interrupt_enable();
 
     for (;;) {
+        /* reset watchdog */
+        hardware_watchdog();
         /* run all threads */
         THREAD_RUN_ALL(threads);
     }

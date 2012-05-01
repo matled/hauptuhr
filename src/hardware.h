@@ -4,12 +4,24 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <avr/interrupt.h>
+#include <avr/wdt.h>
 
 #include "ticks.h"
 
 /* initialize hardware */
 void hardware_init(void);
 
+/* reset watchdog */
+static inline void hardware_watchdog(void) {
+    wdt_reset();
+}
+/* reboot */
+static inline void hardware_reboot(void) {
+    wdt_disable();
+    wdt_enable(WDTO_15MS);
+    for (;;)
+        ;
+}
 /* enable interrupts */
 static inline void hardware_interrupt_enable(void) {
     sei();

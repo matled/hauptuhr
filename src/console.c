@@ -86,6 +86,7 @@ static void print_help(void) {
         " d/D dcf77\r\n"
         " o/O verbose\r\n"
         " e eeprom\r\n"
+        " r reboot\r\n"
         " v version\r\n"
         " h help\r\n"
     );
@@ -103,6 +104,7 @@ static void input(char c) {
     case 'O': print_dcf77_verbose(0); break;
     case 'v': print_version(); break;
     case 'e': print_eeprom(); break;
+    case 'r': hardware_reboot(); break;
     case 'h': print_help(); break;
     default:  print_help(); break;
     }
