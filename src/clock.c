@@ -100,22 +100,17 @@ void clock_set(uint16_t time) {
 }
 
 void clock_adjust(void) {
-    switch (clock_state.state) {
-    case CLOCK_INITIAL:
-    case CLOCK_HEADLESS:
-    case CLOCK_PENDING:
-        clock_state.state = CLOCK_HEADLESS;
-        /* Set time to one minute in the future. */
-        clock_state.time = MOD_TIME_P(clock_state.clock + 1);
-        break;
-    case CLOCK_SYNCED:
-    case CLOCK_RUNNING:
+    if (clock_state.state == CLOCK_RUNNING ||
+        clock_state.state == CLOCK_SYNCED) {
         clock_state.state = CLOCK_RUNNING;
-        /* Set clock to one minute in the past.  If we are currently
-         * advancing this will do nothing. */
-        clock_state.clock = MOD_TIME(clock_state.time - 1);
-        break;
+    /* initial, pending, headless */
+    } else {
+        clock_state.state = CLOCK_HEADLESS;
     }
+
+    /* Set clock to one minute in the past.  If we are currently
+     * advancing this will do nothing. */
+    clock_state.clock = MOD_TIME(clock_state.time - 1);
 
     save();
 }
@@ -128,6 +123,7 @@ void clock_stop(void) {
     if (clock_state.state == CLOCK_RUNNING ||
         clock_state.state == CLOCK_SYNCED) {
         clock_state.state = CLOCK_SYNCED;
+    /* initial, pending, headless */
     } else {
         clock_state.state = CLOCK_INITIAL;
     }
