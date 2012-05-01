@@ -8,7 +8,7 @@ AVRDUDE = avrdude
 MKDIR = mkdir -p
 RM = rm -f
 
-AVRDUDE_FLAGS = -p m168 -c usbasp
+AVRDUDE_FLAGS = -c usbasp
 
 AVR_MCU=atmega168
 AVR_F_CPU=16000000UL
@@ -32,6 +32,7 @@ OBJECTS =
 
 -include config.mk
 
+AVRDUDE_FLAGS += -p $(AVR_MCU)
 AVR_CFLAGS += -mmcu=$(AVR_MCU)
 AVR_CFLAGS += -DF_CPU=16000000UL
 AVR_CFLAGS += -DAVR_EEPROM_SIZE=512
