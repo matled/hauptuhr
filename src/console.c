@@ -97,10 +97,10 @@ static void input(char c) {
     case 'a': print_adjust(); break;
     case 'A': print_auto_adjust(); break;
     case 'z': print_stop(); break;
-    case 'd': print_dcf77(0); break;
-    case 'D': print_dcf77(1); break;
-    case 'o': print_dcf77_verbose(0); break;
-    case 'O': print_dcf77_verbose(1); break;
+    case 'd': print_dcf77(1); break;
+    case 'D': print_dcf77(0); break;
+    case 'o': print_dcf77_verbose(1); break;
+    case 'O': print_dcf77_verbose(0); break;
     case 'v': print_version(); break;
     case 'e': print_eeprom(); break;
     case 'h': print_help(); break;
