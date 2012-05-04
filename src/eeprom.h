@@ -2,6 +2,7 @@
 #define EEPROM_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #define EEPROM_INVALID 0xffff
 
@@ -12,8 +13,8 @@ typedef struct {
     uint16_t location;
     /* first byte & 0x80 has to be equal to this value to be valid */
     uint8_t valid;
-    /* save in progress */
-    uint8_t start_working;
+    /* trigger store thread */
+    bool start_working;
 } eeprom_state_t;
 
 extern eeprom_state_t eeprom_state;
