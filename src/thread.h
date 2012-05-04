@@ -7,10 +7,8 @@ typedef struct _thread_t {
     struct _thread_t *next;
     struct pt pt;
     PT_THREAD((*func)(struct _thread_t*));
-    void *arg;
 } thread_t;
 
-#define THREAD_ARG(type) ((type)self->arg)
 #define THREAD_RUN(thread) ((thread).func(&(thread)))
 #define THREAD_RUN_ALL(threads) do { \
         for (thread_t *thread = (threads); thread; thread = thread->next) \
