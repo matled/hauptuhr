@@ -30,17 +30,17 @@ extern clock_state_t clock_state;
 
 /* CLOCK_INITIAL: initial state
  * clock is not set, time is unknown. */
-#define CLOCK_INITIAL 0
+#define CLOCK_INITIAL (1 << 0)
 /* CLOCK_HEADLESS: running headless
  * clock is running and assumed to be correct, but time is unknown. */
-#define CLOCK_HEADLESS 1
+#define CLOCK_HEADLESS (1 << 1)
 /* CLOCK_PENDING: restored state
  * clock state restored but time is unknown, not running. */
-#define CLOCK_PENDING 2
+#define CLOCK_PENDING (1 << 2)
 /* CLOCK_SYNCED: time known but not running */
-#define CLOCK_SYNCED 3
+#define CLOCK_SYNCED (1 << 3)
 /* CLOCK_RUNNING: time known and clock is set */
-#define CLOCK_RUNNING 4
+#define CLOCK_RUNNING (1 << 4)
 
 void clock_init(void);
 /* Set time (use this for authorative time).  Time is hour * 60 +
@@ -61,7 +61,9 @@ void clock_stop(void);
 #define clock_get_clock() (clock_state.clock)
 #define clock_get_state() (clock_state.state)
 
-#define clock_is_synchronized() (clock_get_state() == CLOCK_SYNCED || clock_get_state() == CLOCK_RUNNING)
-#define clock_is_stopped() (clock_get_state() == CLOCK_INITIAL || clock_get_state() == CLOCK_SYNCED)
+#define clock_is_synchronized() \
+    (clock_get_state() & (CLOCK_SYNCED | CLOCK_RUNNING))
+#define clock_is_stopped() \
+    (clock_get_state() & (CLOCK_INITIAL | CLOCK_SYNCED))
 
 #endif

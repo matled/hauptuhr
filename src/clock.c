@@ -17,12 +17,12 @@ clock_state_t clock_state = {
 
 static void save(void) {
     uint16_t s;
-    if (clock_state.state == CLOCK_RUNNING || clock_state.state == CLOCK_PENDING) {
-        s = clock_state.clock;
+    s = advance_polarity() << 11;
+    if (clock_state.state & (CLOCK_RUNNING | CLOCK_PENDING)) {
+        s |= clock_state.clock;
     } else {
-        s = 0x07ff;
+        s |= 0x07ff;
     }
-    s |= (advance_polarity() << 11);
     if (clock_state.stored != s) {
         clock_state.stored = s;
         eeprom_store(clock_state.stored);
@@ -36,7 +36,7 @@ THREAD(clock_thread) {
         /* advance clock, if */
         THREAD_WAIT_UNTIL(
             /* advance clock in state RUNNING or HEADLESS */
-            (clock_state.state == CLOCK_RUNNING || clock_state.state == CLOCK_HEADLESS) &&
+            (clock_state.state & (CLOCK_RUNNING | CLOCK_HEADLESS)) &&
             /* advance() is ready */
             !advance_busy() &&
             /* waiting for the clock to become correct would take too long */
@@ -81,27 +81,23 @@ void clock_init(void) {
 void clock_set(uint16_t time) {
     clock_state.time = MOD_TIME(time);
 
-    switch (clock_state.state) {
-    case CLOCK_INITIAL:
+    if (clock_state.state & (CLOCK_INITIAL | CLOCK_SYNCED)) {
         clock_state.state = CLOCK_SYNCED;
-        break;
-    case CLOCK_HEADLESS:
-        clock_state.state = CLOCK_RUNNING;
+        return;
+    }
+
+    if (clock_state.state == CLOCK_HEADLESS) {
         /* Assume clock was correct by setting it to one minute in the
          * past, i.e. advance once now. */
         clock_state.clock = MOD_TIME(clock_state.time - 1);
-        break;
-    case CLOCK_PENDING:
-        clock_state.state = CLOCK_RUNNING;
-        break;
     }
+    clock_state.state = CLOCK_RUNNING;
 
     save();
 }
 
 void clock_adjust(void) {
-    if (clock_state.state == CLOCK_RUNNING ||
-        clock_state.state == CLOCK_SYNCED) {
+    if (clock_state.state & (CLOCK_RUNNING | CLOCK_SYNCED)) {
         clock_state.state = CLOCK_RUNNING;
     /* initial, pending, headless */
     } else {
@@ -120,8 +116,7 @@ void clock_advance(int8_t value) {
 }
 
 void clock_stop(void) {
-    if (clock_state.state == CLOCK_RUNNING ||
-        clock_state.state == CLOCK_SYNCED) {
+    if (clock_state.state & (CLOCK_RUNNING | CLOCK_SYNCED)) {
         clock_state.state = CLOCK_SYNCED;
     /* initial, pending, headless */
     } else {
