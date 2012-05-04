@@ -42,8 +42,4 @@ void uart_init(uart_receive_callback_t);
 #define uart_printf(format, ...) \
     fifo_printf(&uart_state.fifo, _UART_STR(format), __VA_ARGS__)
 
-#include "thread.h"
-extern thread_t uart_send;
-extern thread_t uart_recv;
-
 #endif

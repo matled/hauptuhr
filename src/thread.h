@@ -15,9 +15,9 @@ typedef struct _thread_t {
             THREAD_RUN(*thread); \
     } while (0);
 
-#define THREAD(name) PT_THREAD(name ## _func(thread_t *self)); \
-    thread_t name = { .func = name ## _func }; \
-    PT_THREAD(name ## _func(thread_t *self))
+#define THREAD(name) static PT_THREAD(name ## _func(thread_t *self)); \
+    static thread_t name = { .func = name ## _func }; \
+    static PT_THREAD(name ## _func(thread_t *self))
 
 #define THREAD_INIT(thread) PT_INIT(&(thread).pt)
 #define THREAD_BEGIN() PT_BEGIN(&self->pt)

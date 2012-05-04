@@ -19,7 +19,7 @@ static struct {
     ticks_t last_signal;
 } state;
 
-PT_THREAD(blink(struct pt *pt, uint8_t led, uint16_t on, uint16_t off,
+static PT_THREAD(blink(struct pt *pt, uint8_t led, uint16_t on, uint16_t off,
         ticks_t * ticks)) {
     PT_BEGIN(pt);
     TICKS_RESET(*ticks);
