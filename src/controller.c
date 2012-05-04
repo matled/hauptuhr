@@ -15,20 +15,22 @@
 #include "controller.h"
 
 static struct {
-    ticks_t ticks;
-    uint8_t summer_time;
-    uint8_t cet;
-    uint8_t auto_adjust;
-    bool verbose;
+    ticks_t minute;
+    ticks_t last_dcf77;
     ticks_t last_dcf77_error;
+    uint16_t time;
+    bool verbose;
+    bool auto_adjust;
+    bool summer_time;
+    bool cet;
 } state;
 
 THREAD(minute) {
     THREAD_BEGIN();
     for (;;) {
-        while (TICKS_INVALID(state.ticks) ||
-            TICKS_DIFF(state.ticks) < TICKS(60)) {
-            TICKS_NO_WRAP(state.ticks);
+        while (TICKS_INVALID(state.minute) ||
+            TICKS_DIFF(state.minute) < TICKS(60)) {
+            TICKS_NO_WRAP(state.minute);
             THREAD_YIELD();
         }
 
@@ -45,7 +47,7 @@ THREAD(minute) {
             clock_advance(1);
         }
 
-        TICKS_RESET(state.ticks);
+        TICKS_RESET(state.minute);
     }
     THREAD_END();
 }
@@ -101,22 +103,42 @@ static void dcf77_signal(int8_t signal) {
 }
 
 static void dcf77_time(dcf77_t *dcf77) {
-    uart_printf("DCF77: 20%2u-%2u-%2u %2u:%2u\r\n",
+    uart_printf("DCF77: 20%2u-%2u-%2u %2u:%2u",
         dcf77->year, dcf77->month, dcf77->day, dcf77->hour, dcf77->minute);
 
-    led_dcf77();
+    uint16_t now = dcf77->hour * 60 + dcf77->minute;
+    /* if now == time + 1 two successive minutes have been received */
+    if (now == (state.time + 1) % (24 * 60)) {
+        /* print number how many ticks the timer was off for one minute */
+        uart_printf(" (%d)",
+            TICKS_DIFF(state.last_dcf77) - (TICKS_PER_SECOND * 60));
 
-    state.summer_time = dcf77->summer_time;
-    state.cet = dcf77->cet;
+        /* update summer_time and cet */
+        state.summer_time = dcf77->summer_time;
+        state.cet = dcf77->cet;
 
-    clock_set(dcf77->hour * 60 + dcf77->minute);
-    TICKS_RESET(state.ticks);
+        /* set clock */
+        clock_set(dcf77->hour * 60 + dcf77->minute);
+        /* reset ticks for new minute */
+        TICKS_RESET(state.minute);
+
+        /* set the led module know that a dcf77 signal was received
+         * successfully */
+        led_dcf77();
+    } else {
+        uart_print(" (ign)");
+    }
+    uart_print("\r\n");
+
+    /* reset ticks and store time for next minute */
+    TICKS_RESET(state.last_dcf77);
+    state.time = now;
 }
 
 void controller_adjust(void) {
     clock_adjust();
     state.auto_adjust = 0;
-    TICKS_RESET(state.ticks);
+    TICKS_RESET(state.minute);
 }
 
 void controller_auto_adjust(void) {
@@ -126,7 +148,7 @@ void controller_auto_adjust(void) {
 void controller_stop(void) {
     clock_stop();
     state.auto_adjust = 0;
-    TICKS_INVALIDATE(state.ticks);
+    TICKS_INVALIDATE(state.minute);
 }
 
 void controller_verbose(bool value) {
@@ -143,7 +165,7 @@ void controller_init(void) {
 
     THREAD_INIT(minute);
     thread_register(&minute);
-    TICKS_INVALIDATE(state.ticks);
+    TICKS_INVALIDATE(state.minute);
 
     THREAD_INIT(auto_adjust);
     thread_register(&auto_adjust);
